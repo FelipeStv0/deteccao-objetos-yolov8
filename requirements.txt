@@ -1,0 +1,6 @@
+ultralytics
+roboflow
+pandas
+matplotlib
+pillow
+opencv-python
