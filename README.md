@@ -1,19 +1,36 @@
 # Detecção de objetos com YOLOv8
 
-Projeto acadêmico de visão computacional para treinamento, validação e inferência com a biblioteca Ultralytics YOLOv8, usando dataset do Roboflow.
+Projeto de visão computacional com treinamento supervisionado de um detector YOLOv8 para identificar **bolsas, óculos e relógios** em imagens e vídeos.
 
-## Arquivos
-- `notebook.ipynb`: treinamento e avaliação no Google Colab.
-- `resultados/`: gráficos e imagens de avaliação.
-- `prints_treino/`: registros do treinamento.
-- `modelo/best.pt`: pesos treinados; a redistribuição deve respeitar os termos de uso dos dados.
+## Objetivo e abordagem
 
-## Execução
-1. Abra `notebook.ipynb` no Google Colab, preferencialmente com GPU.
-2. Configure a variável de ambiente `ROBOFLOW_API_KEY` com uma chave sua, sem colocá-la no código público.
-3. Instale as bibliotecas em `requirements.txt` e execute as células na sequência.
-4. Ajuste os caminhos para o dataset, o modelo e os vídeos utilizados.
+O estudo utiliza uma base de aproximadamente 500 imagens, com anotações no formato YOLO e divisões de treino, validação e teste. O modelo base informado é o `yolov8s.pt`, treinado por 50 épocas com imagens de 640 × 640 pixels em Google Colab (GPU Tesla T4).
 
-**Segurança:** uma chave exposta no notebook original foi retirada da cópia preparada. A chave antiga deve ser revogada no Roboflow.
+**Tecnologias:** Python, Ultralytics YOLOv8, PyTorch, OpenCV, Pillow, Matplotlib e Pandas.
 
-O dataset completo e os vídeos não acompanham este projeto. As métricas não foram reproduzidas nesta preparação.
+## Resultados relatados
+
+O relatório original apresenta, para a validação identificada como **ONNX, etapa 8**, os seguintes resultados gerais:
+
+| Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
+| ---: | ---: | ---: | ---: |
+| 0,806 | 0,770 | 0,818 | 0,535 |
+
+Essas métricas são **resultados documentados**, ainda não reproduzidos independentemente nesta preparação. Entre as classes, relógios tiveram maior precisão (0,871) e óculos maior recall (0,848). O desempenho é limitado pelo número de imagens, condições de captura e casos de oclusão.
+
+## Arquivos do repositório
+
+- `README.md`: apresentação e resultados documentados.
+- `requirements.txt`: dependências para o ambiente Python.
+
+**A publicação do notebook, do relatório técnico, dos gráficos e dos pesos treinados ainda está pendente.** Por isso, este repositório ainda não fornece uma reprodução completa.
+
+## Execução (após publicação do notebook)
+
+O treinamento usa um dataset preparado no padrão YOLO. Ao publicar o notebook, os caminhos e as instruções de obtenção dos dados precisam estar consistentes. Credenciais do Roboflow devem ser fornecidas por variável de ambiente (por exemplo, `ROBOFLOW_API_KEY`), **nunca no repositório**.
+
+O dataset e os vídeos não devem ser redistribuídos sem conferir as licenças e permissões correspondentes.
+
+## Melhorias futuras
+
+Ampliar e diversificar a base, avaliar aumento de dados (*data augmentation*) e comparar variantes maiores do YOLOv8. Essas propostas não são funcionalidades já implementadas.
