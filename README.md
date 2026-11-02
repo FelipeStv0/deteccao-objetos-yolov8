@@ -22,14 +22,18 @@ Essas métricas são **resultados documentados**, ainda não reproduzidos indepe
 
 - `README.md`: apresentação e resultados documentados.
 - `requirements.txt`: dependências para o ambiente Python.
+- `notebook.ipynb`: treinamento, avaliação e demonstrações (com credencial do Roboflow via variável de ambiente).
+- `modelo/best.pt`: pesos treinados para inferência local.
+- `Relatorio_YOLOv8_Portfolio.pdf`: relatório técnico de resultados.
+- `resultados/`: gráficos e imagens de avaliação.
 
-**No momento da revisão, não foram encontrados na raiz ou nos caminhos esperados o notebook (`notebook.ipynb`), o relatório (`Relatorio_YOLOv8_Portfolio_Sem_Nomes.pdf`) nem os pesos (`modelo/best.pt`).** A reprodução completa depende da publicação desses arquivos e da disponibilidade autorizada do dataset.
+O treinamento completo ainda depende de acesso autorizado ao dataset original; as métricas acima são as documentadas no relatório, não uma reprodução independente.
 
-## Execução (após publicação do notebook)
+## Execução
 
 O treinamento usa um dataset preparado no padrão YOLO. O notebook revisado não contém uma chave de API escrita no código; qualquer acesso futuro ao Roboflow exige uma credencial própria e autorizada, fornecida fora do GitHub (por exemplo, por `ROBOFLOW_API_KEY`). Sem acesso ao workspace original, não é possível garantir o download do mesmo dataset para reproduzir o treinamento.
 
-**Inferência sem Roboflow:** depois da publicação de `modelo/best.pt`, o modelo treinado poderá ser carregado localmente com a biblioteca Ultralytics para detectar objetos em novas imagens. Isso não exige a chave do Roboflow.
+**Inferência sem Roboflow:** o modelo treinado pode ser carregado localmente com a biblioteca Ultralytics para detectar objetos em novas imagens. Isso não exige a chave do Roboflow.
 
 O dataset e os vídeos não devem ser redistribuídos sem conferir as licenças e permissões correspondentes.
 
