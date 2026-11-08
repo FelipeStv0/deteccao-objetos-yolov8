@@ -54,6 +54,7 @@ verificados independentemente com o dataset integral:
 
 A execução de [avaliar_modelo.py](../avaliar_modelo.py) salva
 `metricas_amostra.json`, `erros.csv`,
+`comparacoes/` (GT amarelo, predição azul),
 `benchmark.json` e a auditoria. Também salva um YAML
 com os nomes de classes lidos diretamente do checkpoint. Os resultados
 devem ser rotulados como **exploratórios** para uma amostra pequena.
