@@ -90,7 +90,7 @@ da origem dos pesos/dataset antes de redistribuição comercial.
 
 - [Execução do notebook e treinamento original](../notebook.ipynb)
   (requer acesso autorizado à origem dos dados).
-- [Guia de reprodução e comandos](REPRODUCAO.md).
+- [Guia de reprodução e comandos](REPRODUCAO.md), incluindo a dependência de avaliação `PyYAML` no arquivo `requirements-avaliacao.txt`.
 - [Plano de avaliação rigorosa futura](AVALIACAO.md).
 - [GitHub Actions](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions).
 
