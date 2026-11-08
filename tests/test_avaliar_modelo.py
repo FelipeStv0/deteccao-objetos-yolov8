@@ -1,6 +1,11 @@
 """Testes matemáticos do diagnóstico e benchmark, sem Ultralytics."""
 
 import unittest
+import sys
+import tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 from pathlib import Path
 from collections import Counter
 from types import SimpleNamespace
@@ -8,6 +13,7 @@ from unittest.mock import patch
 
 from avaliar_modelo import (benchmark, extrair_metricas, identificar_erros,
                            iou_xyxy, normalizar_nomes, percentil_nearest_rank,
+                           salvar_comparacao,
                            resumir_erros)
 
 
@@ -82,6 +88,32 @@ class TestAvaliacao(unittest.TestCase):
         self.assertEqual(resultado["repeticoes"], 2)
         self.assertAlmostEqual(resultado["latencia_ms"]["media"], 250.0)
         self.assertEqual(resultado["latencia_ms"]["p95_nearest_rank"], 300.0)
+
+
+    def test_comparacao_desenha_gt_e_predicoes(self):
+        chamadas = {"retangulos": 0, "textos": []}
+        cv2_falso = SimpleNamespace(
+            rectangle=lambda *a: chamadas.__setitem__(
+                "retangulos", chamadas["retangulos"] + 1
+            ),
+            putText=lambda canvas, texto, *a: chamadas["textos"].append(texto),
+            imwrite=lambda *a: True,
+            FONT_HERSHEY_SIMPLEX=0,
+        )
+        imagem_falsa = SimpleNamespace(copy=lambda: object())
+        with tempfile.TemporaryDirectory() as pasta:
+            with patch.dict(sys.modules, {"cv2": cv2_falso}):
+                salvar_comparacao(
+                    imagem_falsa,
+                    [{"classe_id": 0, "xyxy": [1, 2, 12, 15]}],
+                    [{"classe_id": 0, "conf": 0.93, "xyxy": [1, 2, 12, 15]}],
+                    {0: "bolsa"},
+                    Path(pasta) / "comparacoes" / "a.jpg",
+                )
+        self.assertEqual(chamadas["retangulos"], 2)
+        self.assertTrue(chamadas["textos"][0].startswith("GT bolsa"))
+        self.assertTrue(chamadas["textos"][1].startswith("PRED bolsa"))
+
 
 
 if __name__ == "__main__":
