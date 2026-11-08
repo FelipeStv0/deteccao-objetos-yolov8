@@ -1,4 +1,4 @@
-name: Testes da inferencia local
+name: Testes e demonstracao de inferencia YOLOv8
 
 on:
   push:
@@ -7,36 +7,63 @@ on:
 
 jobs:
   testes-unitarios:
+    name: Unitarios (${{ matrix.os }}, Python ${{ matrix.python-version }})
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.11']
+        python-version: ['3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Verificar ajuda da interface
-        run: python inferir.py --help
-      - name: Validar argumentos e chamada do modelo simulado
+      - name: Validar CLI de imagens e video
+        run: |
+          python inferir.py --help
+          python inferir_video.py --help
+      - name: Testar relatorios, validacoes e modelos simulados
         run: python -m unittest discover -s tests -v
 
-  inferencia-real:
+  integracao-real:
+    name: Modelo real em CPU (imagens e video)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Instalar dependencias da inferencia
+          python-version: '3.12'
+      - name: Instalar PyTorch CPU
+        run: python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - name: Instalar dependencias de inferencia
         run: python -m pip install -r requirements-inferencia.txt
-      - name: Executar uma imagem com o checkpoint real em CPU
+      - name: Executar 10 imagens de exemplo com best.pt
         run: >-
           python inferir.py
-          --input dataset_amostra/test/images/bolsa_feminina_sozinha7_jpg.rf.2816a38814eaf744eebc134f57e0ae25.jpg
-          --output runs/ci
+          --input dataset_amostra/test/images
+          --output runs/ci_imagens
           --device cpu
-      - name: Confirmar que a imagem anotada foi gerada
+      - name: Verificar imagens e relatorios
         run: |
-          python -c "from pathlib import Path; p = Path('runs/ci/bolsa_feminina_sozinha7_jpg.rf.2816a38814eaf744eebc134f57e0ae25.jpg'); assert p.is_file() and p.stat().st_size > 0, f'Arquivo ausente ou vazio: {p}'; print(p, p.stat().st_size, 'bytes')"
+          python -c "import csv,json; from pathlib import Path; p=Path('runs/ci_imagens'); d=json.loads((p/'resumo.json').read_text(encoding='utf-8')); linhas=list(csv.DictReader((p/'deteccoes.csv').open(encoding='utf-8-sig'))); assert d['resumo']['total_imagens']==10; assert d['resumo']['total_deteccoes']==len(linhas); assert len(list(p.glob('*.jpg')))==10; print('Verificadas 10 imagens anotadas e',len(linhas),'deteccoes')"
+      - name: Executar 2 quadros do video com best.pt
+        run: >-
+          python inferir_video.py
+          --input video/video_original.mp4
+          --output runs/ci_video/anotado.mp4
+          --device cpu
+          --max-frames 2
+      - name: Verificar video e relatorios
+        run: |
+          python -c "import csv,json; from pathlib import Path; p=Path('runs/ci_video'); d=json.loads((p/'resumo.json').read_text(encoding='utf-8')); linhas=list(csv.DictReader((p/'deteccoes.csv').open(encoding='utf-8-sig'))); assert d['resumo']['quadros_processados']==2; assert d['resumo']['total_deteccoes']==len(linhas); assert (p/'anotado.mp4').is_file() and (p/'anotado.mp4').stat().st_size>0; print('Verificados video MP4, 2 quadros e',len(linhas),'deteccoes')"
+      - name: Disponibilizar artefatos de exemplo
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exemplos-inferencia-yolov8
+          path: |
+            runs/ci_imagens/
+            runs/ci_video/
+          retention-days: 14
+          if-no-files-found: error
