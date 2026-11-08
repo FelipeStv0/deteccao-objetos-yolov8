@@ -81,7 +81,7 @@ class TestExecutar(unittest.TestCase):
                          ["a.jpg", "b.png"])
         self.assertTrue(all(c["save"] and c["exist_ok"] for c in chamadas))
         self.assertTrue(all(c["conf"] == 0.3 and c["imgsz"] == 640 for c in chamadas))
-        self.assertTrue(all(c["project"] == str(self.saida.parent)
+        self.assertTrue(all(c["project"] == str(self.saida.resolve().parent)
                             and c["name"] == self.saida.name for c in chamadas))
 
     def test_pesos_ausentes(self):
