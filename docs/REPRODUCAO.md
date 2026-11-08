@@ -46,6 +46,7 @@ Saídas:
 - `metricas_amostra.json` — métricas Ultralytics sobre **10 imagens**;
 - `erros.csv` — erros de pareamento por imagem, IoU=0,5;
 - `benchmark.json` — latências de imagem única, após warmup;
+- `comparacoes/` — quadros comparativos, caixas anotadas em amarelo (GT) e predições em azul (PRED);
 - `validacao_ultralytics/` — arquivos auxiliares de validação.
 
 **Importante:** trata-se de uma avaliação de uma amostra pequena, 
