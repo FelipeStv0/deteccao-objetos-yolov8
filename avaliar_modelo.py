@@ -176,7 +176,7 @@ def percentil_nearest_rank(valores: list[float], percentil: float) -> float:
 
 
 def benchmark(modelo, entrada: Path, dispositivo: str, imgsz: int,
-              aquecimentos: int, repeticoes: int) -> dict:
+              aquecimentos: int, repeticoes: int, conf: float = 0.25) -> dict:
     """Latência wall-clock por imagem, após carregar o checkpoint.
 
     Inclui carregar arquivo da imagem e pré/pós-processar, mas não criar o
@@ -184,11 +184,20 @@ def benchmark(modelo, entrada: Path, dispositivo: str, imgsz: int,
     """
     if aquecimentos < 0 or repeticoes < 1:
         raise ValueError("Aquecimentos >= 0 e repetições >= 1 são obrigatórios")
+    def sincronizar_gpu():
+        if dispositivo != "cpu" and (str(dispositivo).isdigit()
+                                   or str(dispositivo).startswith("cuda")):
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+
     tempos_ms = []
     for indice in range(aquecimentos + repeticoes):
+        sincronizar_gpu()
         inicio = time.perf_counter()
         modelo.predict(source=str(entrada), device=dispositivo,
-                       imgsz=imgsz, conf=0.25, verbose=False)
+                       imgsz=imgsz, conf=conf, verbose=False)
+        sincronizar_gpu()
         duracao = (time.perf_counter() - inicio) * 1000
         if indice >= aquecimentos:
             tempos_ms.append(duracao)
@@ -330,7 +339,7 @@ def executar(base: Path, pesos: Path, saida: Path, dispositivo: str = "cpu",
         encoding="utf-8",
     )
     bench = benchmark(
-        modelo, imagens[0], dispositivo, imgsz, aquecimentos, repeticoes
+        modelo, imagens[0], dispositivo, imgsz, aquecimentos, repeticoes, conf
     )
     bench["metadados"] = metadados
     (saida / "benchmark.json").write_text(
