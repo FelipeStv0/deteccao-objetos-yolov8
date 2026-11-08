@@ -1,0 +1,3 @@
+# Dependências extras para auditoria avançada e avaliação de métricas.
+-r requirements-inferencia.txt
+PyYAML>=6,<7

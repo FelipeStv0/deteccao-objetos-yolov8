@@ -40,7 +40,7 @@ jobs:
       - name: Instalar PyTorch CPU
         run: python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
       - name: Instalar inferencia
-        run: python -m pip install -r requirements-inferencia.txt
+        run: python -m pip install -r requirements-avaliacao.txt
       - name: Avaliar amostra e medir latencia
         run: >-
           python avaliar_modelo.py
