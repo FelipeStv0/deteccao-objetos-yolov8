@@ -74,7 +74,7 @@ O JSON contém os mesmos registros, parâmetros de inferência e contagens totai
 
 - [CI anterior, execução #42500205606](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42500205606): checkpoint real executado em CPU, uma imagem processada, uma detecção e imagem anotada com 95.080 bytes.
 - Execução **relatada pelo responsável** no Windows com Python 3.12: 10 imagens da amostra processadas com 12 detecções; também relatou funcionamento com 10 imagens adicionais particulares. Os arquivos particulares e rótulos de referência não foram publicados.
-- O **workflow desta versão** testa a CLI e os relatórios em Windows/Linux com Python 3.11/3.12 e executa em CPU as 10 imagens versionadas e 2 quadros de vídeo com `best.pt`. Os artefatos são disponibilizados por 14 dias **quando o job passar**. [Consultar o GitHub Actions](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/workflows/testes-inferencia.yml).
+- [**CI desta versão, execução #42532214096**](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42532214096): **sucesso**, com **25 testes unitários aprovados em cada uma das quatro combinações** (Windows/Linux, Python 3.11/3.12); checkpoint real em CPU processou **10 imagens, 12 detecções** e **2 quadros de vídeo, 4 detecções**. Os dez arquivos JPG anotados, MP4, CSV e JSON foram validados no CI. O artefato `exemplos-inferencia-yolov8` está disponível nessa execução por 14 dias. Esses totais não medem acurácia.
 
 ### Métricas relatadas no relatório original, não reproduzidas independentemente
 
