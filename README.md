@@ -147,4 +147,14 @@ O experimento original documenta aproximadamente 500 imagens anotadas no padrão
 
 A reprodução do treinamento integral depende do **dataset original e de permissões adequadas**, não contidos na amostra reduzida. O notebook original depende de credencial autorizada `ROBOFLOW_API_KEY` para acessar o workspace. Os scripts locais de inferência **não usam Roboflow**.
 
+## Natureza acadêmica e direitos de uso
+
+Este repositório é um **projeto acadêmico e de portfólio profissional**, desenvolvido para estudo e demonstração de técnicas de visão computacional e aprendizado de máquina. **Não comercializa produtos ou serviços** nem se destina à exploração comercial das imagens apresentadas.
+
+**Importante:** o caráter educativo ou não comercial **não concede automaticamente autorização** para copiar, modificar ou redistribuir imagens, vídeos, datasets ou outros conteúdos protegidos. Cada material de terceiros continua sujeito aos direitos de seus titulares e às condições de sua licença ou autorização específica. A atribuição da fonte e este aviso também **não substituem uma licença ou permissão**.
+
+Antes de publicar arquivos de terceiros, é necessário verificar sua procedência, termos de uso, requisitos de atribuição e permissão de redistribuição; no caso de imagens com pessoas identificáveis, também podem existir direitos de imagem e outras obrigações aplicáveis. Arquivos sem autorização comprovável devem ser substituídos por materiais próprios, licenciados adequadamente ou removidos do repositório. Em caso de solicitação fundamentada de titular de direitos, o conteúdo será analisado e poderá ser retirado.
+
+A declaração acima descreve a finalidade do projeto; **não constitui uma afirmação de que todos os materiais atuais possuem autorização de redistribuição**.
+
 Verifique licença e permissão antes de redistribuir imagens, vídeos, pesos de terceiros ou fotografias com pessoas identificáveis.
