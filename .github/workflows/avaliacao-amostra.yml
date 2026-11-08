@@ -67,6 +67,7 @@ jobs:
           assert audit["aprovado"] is True
           assert audit["divisoes"]["test"]["imagens"] == 10
           assert metricas["metadados"]["amostra_imagens_teste"] == 10
+          assert len(list((root / "comparacoes").glob("*.jpg"))) == 10
           assert metricas["diagnostico_operacional"]["total_erros"] == len(erros)
           assert bench["repeticoes"] == 10
           assert bench["latencia_ms"]["media"] > 0
