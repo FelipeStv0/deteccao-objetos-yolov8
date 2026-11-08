@@ -10,7 +10,7 @@
 
 - [Execução #42500205606](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42500205606) confirmou **1 imagem**, **1 detecção** e arquivo anotado de **95.080 bytes** usando `best.pt`.
 - O responsável relatou execução Windows/Python 3.12 com **10 imagens versionadas e 12 detecções**, além do processamento bem-sucedido de **10 fotos adicionais**. Os resultados particulares não foram fornecidos como artefatos nem anotados para avaliação independente.
-- A nova execução do GitHub Actions compara o número de registros do CSV aos totais do JSON e verifica os arquivos produzidos. Isso **não** verifica a correção semântica das caixas.
+- [Execução #42532214096](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42532214096): **todos os cinco jobs aprovados**, incluindo 25 testes unitários em cada um dos quatro ambientes, **10 imagens reais processadas com 12 detecções**, **2 quadros de vídeo com 4 detecções** e validação da existência dos arquivos JPG, MP4, CSV e JSON. A comparação entre registros do CSV e os totais do JSON **não** verifica a correção semântica das caixas.
 
 ## Estrutura dos dados exportados
 
