@@ -51,9 +51,10 @@ Saídas:
 
 **Importante:** trata-se de uma avaliação de uma amostra pequena, 
 não de verificação do relatório original nem estimativa robusta de 
-generalização. O YAML publicado em `dataset_amostra/data.yaml`
-descreve classes e estrutura; o script gera **seu próprio YAML absoluto**
-para evitar erro ao executar fora da raiz do repositório.
+generalização. O script gera **seu próprio YAML com o caminho absoluto da amostra**
+no diretório de resultados. Isso impede que uma configuração relativa
+aponte acidentalmente para o diretório errado. Os IDs de classe da
+amostra são documentados na [model card](MODEL_CARD.md).
 
 ## 4. Testar imagens e vídeos
 
