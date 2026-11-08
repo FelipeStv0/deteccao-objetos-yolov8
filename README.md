@@ -1,96 +1,117 @@
 # Detecção de objetos com YOLOv8
 
-Projeto de visão computacional com treinamento supervisionado de um detector YOLOv8 para identificar **bolsas, óculos e relógios** em imagens e vídeos.
+Detector de **bolsas, óculos e relógios** em imagens e vídeos, com pesos treinados no arquivo `modelo/best.pt`. A inferência é **100% local**, sem chave de Roboflow, API externa ou acesso ao dataset de treinamento.
 
-## Objetivo e abordagem
+## Exemplo visual
 
-O estudo utiliza uma base de aproximadamente 500 imagens, com anotações no formato YOLO e divisões de treino, validação e teste. O modelo base informado é o `yolov8s.pt`, treinado por 50 épocas com imagens de 640 × 640 pixels em Google Colab (GPU Tesla T4).
+![Predições do experimento original](resultados/val_batch0_pred.jpg)
 
-**Tecnologias:** Python, Ultralytics YOLOv8, PyTorch, OpenCV, Pillow, Matplotlib e Pandas.
+*Imagem de predições preservada do experimento anterior. Não é uma nova avaliação de qualidade. Veja [exemplos](docs/EXEMPLOS.md).*
 
-## Resultados relatados
+## Execução rápida no Windows (PowerShell)
 
-O relatório original apresenta, para a validação identificada como **ONNX, etapa 8**, os seguintes resultados gerais:
+Com Python **3.12** (ou 3.11) instalado, na pasta do projeto:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-inferencia.txt
+.\.venv\Scripts\python.exe inferir.py
+```
+
+O comando processa as **10 imagens** de `dataset_amostra/test/images`. As imagens anotadas mantêm os nomes de origem e são gravadas em `runs/inferencia_local/`, junto com `deteccoes.csv` e `resumo.json`.
+
+### Testar imagens próprias de uma só vez
+
+Coloque suas imagens em uma pasta separada, por exemplo `Downloads\teste_yolo`:
+
+```powershell
+.\.venv\Scripts\python.exe inferir.py --input "$env:USERPROFILE\Downloads\teste_yolo" --output "runs\imagens_proprias"
+explorer .\runs\imagens_proprias
+```
+
+É possível passar uma única imagem em `--input`. São aceitos JPG, JPEG, PNG, BMP, WEBP e TIFF, **sem percorrer subpastas**. Arquivos originais não são alterados.
+
+### Detectar objetos em um vídeo
+
+O projeto já contém um vídeo original de demonstração:
+
+```powershell
+.\.venv\Scripts\python.exe inferir_video.py
+explorer .\runs\video_local
+```
+
+Para vídeos próprios:
+
+```powershell
+.\.venv\Scripts\python.exe inferir_video.py --input "$env:USERPROFILE\Downloads\teste.mp4" --output "runs\video_proprio\anotado.mp4"
+```
+
+Aceita entradas MP4, AVI, MOV ou MKV, desde que o OpenCV consiga decodificá-las, e exporta MP4 anotado (dependente do codec disponível). O programa usa as dimensões e o FPS da entrada. Para executar rapidamente apenas parte do vídeo, acrescente `--max-frames 30` (0 = vídeo completo).
+
+### Opções
+
+| Parâmetro | Padrão | Função |
+| --- | --- | --- |
+| `--input` | Amostra versionada | Arquivo ou pasta de entrada |
+| `--model` | `modelo/best.pt` | Checkpoint local |
+| `--output` | Diretório em `runs/` | Imagens/pasta ou vídeo MP4 |
+| `--conf` | `0.25` | Confiança mínima entre 0 e 1 |
+| `--imgsz` | `640` | Tamanho de inferência |
+| `--device` | `cpu` | CPU ou GPU CUDA (ex.: `0`) |
+| `--max-frames` | `0` | Apenas vídeo; 0 sem limite |
+
+A ajuda está em `python inferir.py --help` ou `python inferir_video.py --help`. Em máquinas com Python 3.11, substitua `py -3.12` por `py -3.11`. Para usar GPU, PyTorch precisa estar instalado com suporte CUDA compatível.
+
+## Relatórios exportados
+
+O CSV contém **uma linha por detecção**, com nome do arquivo, ID e nome da classe, confiança de 0 a 1 e coordenadas `x1, y1, x2, y2` em pixels. Para vídeos, registra também número do quadro e tempo em segundos.
+
+O JSON contém os mesmos registros, parâmetros de inferência e contagens totais. Imagens sem objetos detectados são contabilizadas no resumo; quando não há detecções, o CSV conserva seu cabeçalho. Esses arquivos são salvos junto das imagens ou do vídeo gerado.
+
+**Confiança de detecção não é probabilidade comprovada de acerto, e o número de caixas detectadas não equivale a Precision, Recall ou mAP.** Detalhes em [avaliação e limites](docs/AVALIACAO.md).
+
+## Evidências verificadas e histórico
+
+- [CI anterior, execução #42500205606](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42500205606): checkpoint real executado em CPU, uma imagem processada, uma detecção e imagem anotada com 95.080 bytes.
+- Execução **relatada pelo responsável** no Windows com Python 3.12: 10 imagens da amostra processadas com 12 detecções; também relatou funcionamento com 10 imagens adicionais particulares. Os arquivos particulares e rótulos de referência não foram publicados.
+- O **workflow desta versão** testa a CLI e os relatórios em Windows/Linux com Python 3.11/3.12 e executa em CPU as 10 imagens versionadas e 2 quadros de vídeo com `best.pt`. Os artefatos são disponibilizados por 14 dias **quando o job passar**. [Consultar o GitHub Actions](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/workflows/testes-inferencia.yml).
+
+### Métricas relatadas no relatório original, não reproduzidas independentemente
 
 | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
 | ---: | ---: | ---: | ---: |
 | 0,806 | 0,770 | 0,818 | 0,535 |
 
-Essas métricas são **resultados documentados**, ainda não reproduzidos independentemente nesta preparação. Entre as classes, relógios tiveram maior precisão (0,871) e óculos maior recall (0,848). O desempenho é limitado pelo número de imagens, condições de captura e casos de oclusão.
+Esses números constam no relatório original, na validação identificada como **ONNX, etapa 8**. A inferência local e o CI comprovam o funcionamento do sistema em cenários específicos, **não** a validade das métricas publicadas. A reprodução exige o dataset original anotado e um protocolo de avaliação equivalente.
 
-## Arquivos do repositório
+## Testes automatizados
 
-- `README.md`: apresentação e resultados documentados.
-- `requirements.txt`: dependências para o ambiente Python.
-- `notebook.ipynb`: treinamento, avaliação e demonstrações (com credencial do Roboflow via variável de ambiente).
-- `modelo/best.pt`: pesos treinados para inferência local.
-- `Relatorio_YOLOv8_Portfolio.pdf`: relatório técnico de resultados.
-- `resultados/`: gráficos e imagens de avaliação.
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
 
-O treinamento completo ainda depende de acesso autorizado ao dataset original; as métricas acima são as documentadas no relatório, não uma reprodução independente.
+Os testes unitários usam objetos YOLO/OpenCV simulados para verificar seleção de arquivos, parâmetros, contagens, exportação CSV/JSON, ausência de detecções e processamento de vídeo. A integração real é um job **separado** no GitHub Actions.
 
-## Execução
+## Estrutura
 
-O treinamento usa um dataset preparado no padrão YOLO. O notebook revisado não contém uma chave de API escrita no código; qualquer acesso futuro ao Roboflow exige uma credencial própria e autorizada, fornecida fora do GitHub (por exemplo, por `ROBOFLOW_API_KEY`). Sem acesso ao workspace original, não é possível garantir o download do mesmo dataset para reproduzir o treinamento.
+```text
+inferir.py                    # Inferência de imagens
+inferir_video.py              # Inferência de vídeo
+relatorios.py                 # Exportação CSV/JSON
+modelo/best.pt                # Pesos treinados
+dataset_amostra/              # Amostra reduzida com imagens e labels
+video/                        # Vídeo de entrada e resultado anterior
+resultados/                   # Gráficos e imagens originais
+tests/                        # Testes unitários
+docs/EXEMPLOS.md              # Referências visuais e saídas reprodutíveis
+docs/AVALIACAO.md             # Evidências, métricas e limitações
+requirements-inferencia.txt   # Dependências para demonstrar localmente
+requirements.txt              # Dependências legadas do notebook
+notebook.ipynb                # Treinamento/experimento original
+```
 
-**Inferência sem Roboflow:** o modelo treinado pode ser carregado localmente com a biblioteca Ultralytics para detectar objetos em novas imagens. Isso não exige a chave do Roboflow.
+O experimento original documenta aproximadamente 500 imagens anotadas no padrão YOLO, uso de `yolov8s.pt`, 50 épocas, tamanho 640×640 e Google Colab com Tesla T4.
 
-O dataset e os vídeos não devem ser redistribuídos sem conferir as licenças e permissões correspondentes.
+A reprodução do treinamento integral depende do **dataset original e de permissões adequadas**, não contidos na amostra reduzida. O notebook original depende de credencial autorizada `ROBOFLOW_API_KEY` para acessar o workspace. Os scripts locais de inferência **não usam Roboflow**.
 
-## Inferência local com o checkpoint treinado
-
-Esta etapa **não utiliza Roboflow**, API, token, Google Colab ou o dataset de treinamento completo. O repositório já inclui 'modelo/best.pt' e imagens de demonstração em 'dataset_amostra/test/images'. As predições usam exclusivamente arquivos locais.
-
-### Passo a passo (Windows / PowerShell)
-
-Recomendado: Python 3.11 (ou 3.12), Git e ambiente com acesso à internet apenas para instalar os pacotes na primeira vez.
-
-1. Clone e entre na pasta do projeto:
-
-   ```powershell
-   git clone https://github.com/FelipeStv0/deteccao-objetos-yolov8.git
-   cd deteccao-objetos-yolov8
-   ```
-
-2. Crie um ambiente virtual e instale **somente** as dependências necessárias para inferência:
-
-   ```powershell
-   py -3.11 -m venv .venv
-   .\.venv\Scripts\python.exe -m pip install -r requirements-inferencia.txt
-   ```
-
-   Se o Python 3.11 não estiver instalado, use `py -3.12` (caso possua o 3.12) ou instale uma das versões. Não é necessário ativar o ambiente virtual.
-
-3. Execute a demonstração sobre as imagens já incluídas:
-
-   ```powershell
-   .\.venv\Scripts\python.exe inferir.py
-   ```
-
-   As imagens anotadas serão salvas em `runs/inferencia_local/`. Para uma imagem própria, passe seu caminho local entre aspas:
-
-   ```powershell
-   .\.venv\Scripts\python.exe inferir.py --input "C:\Imagens\minha_foto.jpg"
-   ```
-
-   Para uma pasta de imagens e outro diretório de resultados:
-
-   ```powershell
-   .\.venv\Scripts\python.exe inferir.py --input "C:\Imagens" --output "runs\minhas_predicoes" --conf 0.30
-   ```
-
-O script varre apenas as imagens **diretamente dentro** da pasta indicada (sem subpastas). Formatos: JPG, JPEG, PNG, BMP, WEBP e TIFF. Ao terminar, informa a quantidade de imagens processadas e detecções e salva imagens com caixas e rótulos. Não modifica os arquivos de entrada. Por padrão usa CPU, sem exigir CUDA. Se houver GPU NVIDIA com PyTorch/CUDA corretamente configurado, é possível usar `--device 0`. Para ver as opções: `python inferir.py --help`.
-
-### Testes e limites de verificação
-
-- Testes automatizados de lógica/CLI: `python -m unittest discover -s tests -v`. Foram executados localmente: **11 testes passaram**. Eles usam um **modelo simulado**; não medem a acurácia nem validam a execução dos pesos reais.
-- Workflow do GitHub Actions: executa esses testes em Linux/Windows e tenta uma inferência **real**, em CPU, com `modelo/best.pt` e uma imagem versionada. A execução só está comprovada quando o job `inferencia-real` terminar com sucesso na aba Actions.
-- A execução end-to-end com o checkpoint real **não foi verificada neste ambiente**, pois aqui não foi possível instalar os pacotes/obter os binários necessários pela rede. Nenhum resultado de detecção real é inventado neste README.
-- **Inferência não é avaliação**: observar caixas sobre imagens não reproduz Precision, Recall, mAP@0.5 ou mAP@0.5:0.95. Essas métricas continuam sendo apenas as relatadas no documento original, **não independentemente verificadas**.
-- O treinamento integral e a reavaliação rigorosa exigem o dataset original, suas divisões e as anotações correspondentes. A amostra reduzida versionada não substitui essa base.
-
-Para verificar as predições reais no seu computador, execute o passo 3 e inspecione os arquivos gerados. Se aparecer `ModuleNotFoundError: ultralytics`, confirme que instalou as dependências no mesmo ambiente usado para executar o script. Se aparecer `Pesos não encontrados`, verifique a presença de `modelo/best.pt` ou informe o caminho com `--model`.
-
-## Melhorias futuras
-
-Ampliar e diversificar a base, avaliar aumento de dados (*data augmentation*) e comparar variantes maiores do YOLOv8. Essas propostas não são funcionalidades já implementadas.
+Verifique licença e permissão antes de redistribuir imagens, vídeos, pesos de terceiros ou fotografias com pessoas identificáveis.
