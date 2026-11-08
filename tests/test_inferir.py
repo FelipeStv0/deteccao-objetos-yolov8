@@ -1,6 +1,8 @@
-"""Testes do invólucro de inferência, sem carregar pesos nem utilizar rede."""
+"""Testes de inferência em imagens com pesos e Ultralytics simulados."""
 
+import csv
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -9,6 +11,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import inferir
+from tests.helpers import ResultadoFalso
 
 
 class TestListarImagens(unittest.TestCase):
@@ -58,9 +61,8 @@ class TestExecutar(unittest.TestCase):
             (self.pasta_imagens / nome).touch()
         self.saida = self.raiz / "resultados"
 
-    def test_predicao_usa_pesos_locais_e_salva_resultados(self):
-        chamadas = []
-        carregamentos = []
+    def test_predicao_gera_relatorios_e_contagens(self):
+        chamadas, carregamentos = [], []
 
         class ModeloFalso:
             def __init__(self, caminho):
@@ -68,13 +70,18 @@ class TestExecutar(unittest.TestCase):
 
             def predict(self, **kwargs):
                 chamadas.append(kwargs)
-                return [SimpleNamespace(boxes=[object(), object()])]
+                if Path(kwargs["source"]).name == "a.jpg":
+                    return [ResultadoFalso([
+                        (0, 0.9, [2, 3, 25, 28]),
+                        (1, 0.6, [1, 2, 7, 9]),
+                    ])]
+                return [ResultadoFalso()]
 
         with patch.dict(sys.modules, {"ultralytics": SimpleNamespace(YOLO=ModeloFalso)}):
             with patch("sys.stdout", new_callable=io.StringIO):
                 self.assertEqual(inferir.executar(
                     self.pasta_imagens, self.pesos, self.saida, 0.3, 640, "cpu"
-                ), (2, 4))
+                ), (2, 2))
 
         self.assertEqual(carregamentos, [str(self.pesos)])
         self.assertEqual([Path(c["source"]).name for c in chamadas],
@@ -83,6 +90,15 @@ class TestExecutar(unittest.TestCase):
         self.assertTrue(all(c["conf"] == 0.3 and c["imgsz"] == 640 for c in chamadas))
         self.assertTrue(all(c["project"] == str(self.saida.resolve().parent)
                             and c["name"] == self.saida.name for c in chamadas))
+        with (self.saida / "deteccoes.csv").open(encoding="utf-8-sig", newline="") as f:
+            rows = list(csv.DictReader(f))
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["classe"], "bolsa")
+        resumo = json.loads((self.saida / "resumo.json").read_text(encoding="utf-8"))
+        self.assertEqual(resumo["resumo"]["total_imagens"], 2)
+        self.assertEqual(resumo["resumo"]["total_deteccoes"], 2)
+        self.assertEqual(resumo["resumo"]["imagens_sem_deteccoes"], 1)
+        self.assertEqual(resumo["resumo"]["imagens"][1]["deteccoes"], 0)
 
     def test_pesos_ausentes(self):
         with self.assertRaisesRegex(FileNotFoundError, "Pesos"):
@@ -90,7 +106,7 @@ class TestExecutar(unittest.TestCase):
                              self.saida, 0.25, 640, "cpu")
 
     def test_conf_invalida(self):
-        for conf in (-0.1, 1.1):
+        for conf in (-0.1, 1.1, float("nan")):
             with self.subTest(conf=conf), self.assertRaisesRegex(ValueError, "conf"):
                 inferir.executar(self.pasta_imagens, self.pesos,
                                  self.saida, conf, 640, "cpu")
