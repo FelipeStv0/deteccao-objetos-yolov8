@@ -97,7 +97,7 @@ explorer .\runs\avaliacao_amostra
 
 - **Auditoria da amostra:** verifica rótulos, limites das caixas, correspondência com imagens e SHA-256 entre as divisões (não detecta todas as duplicações visuais).
 - **Avaliação exploratória:** calcula Precision, Recall e mAP sobre **apenas dez imagens de teste anotadas**, usando o checkpoint real e o Ultralytics. Esse resultado **não substitui** os números do relatório do conjunto integral.
-- **Diagnóstico de erros:** `erros.csv` contém falsos positivos/falsos negativos por imagem com limite de IoU de 0,5 e confiança de 0,25.
+- **Diagnóstico de erros:** `erros.csv` contém falsos positivos/falsos negativos por imagem com limite de IoU de 0,5 e confiança de 0,25. O diretório `comparacoes/` contém imagens com caixas **reais em amarelo** e **predições em azul**, facilitando inspeção visual.
 - **Benchmark:** `benchmark.json` traz média, mediana, p95 e ambiente de medição; não é FPS medido em vídeo.
 - **Rastreabilidade:** `metricas_amostra.json` inclui hash SHA-256 do checkpoint, versões e parâmetros.
 
