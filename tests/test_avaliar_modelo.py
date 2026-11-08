@@ -1,13 +1,10 @@
 """Testes matemáticos do diagnóstico e benchmark, sem Ultralytics."""
 
-import unittest
 import sys
 import tempfile
-from pathlib import Path
-from types import SimpleNamespace
-from unittest.mock import patch
-from pathlib import Path
+import unittest
 from collections import Counter
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
