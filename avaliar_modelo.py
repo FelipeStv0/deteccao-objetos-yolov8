@@ -128,6 +128,31 @@ def identificar_erros(gts: list[dict], preds: list[dict],
     return erros, por_classe
 
 
+def salvar_comparacao(imagem_bgr, gts: list[dict], preds: list[dict],
+                    nomes: dict[int, str], destino: Path) -> None:
+    """Visualiza GT amarelo e predições azuis na mesma imagem (BGR)."""
+    import cv2
+
+    canvas = imagem_bgr.copy()
+    for tipo, caixas, cor in (
+        ("GT", gts, (0, 255, 255)),
+        ("PRED", preds, (255, 0, 0)),
+    ):
+        for caixa in caixas:
+            x1, y1, x2, y2 = [int(round(v)) for v in caixa["xyxy"]]
+            cv2.rectangle(canvas, (x1, y1), (x2, y2), cor, 2)
+            texto = f"{tipo} {nomes[caixa['classe_id']]}"
+            if tipo == "PRED":
+                texto += f" {caixa['conf']:.2f}"
+            cv2.putText(
+                canvas, texto, (max(0, x1), max(12, y1 - 5)),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, cor, 1,
+            )
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    if not cv2.imwrite(str(destino), canvas):
+        raise OSError(f"Falha ao gravar comparação: {destino}")
+
+
 def resumir_erros(totais: Counter, nomes: dict[int, str]) -> list[dict]:
     relatorio = []
     for id_classe, nome in nomes.items():
@@ -237,6 +262,7 @@ def executar(base: Path, pesos: Path, saida: Path, dispositivo: str = "cpu",
     erros = []
     totais = Counter()
     por_imagem = []
+    comparacoes_dir = saida / "comparacoes"
     for imagem in imagens:
         resultado = modelo.predict(
             source=str(imagem), device=dispositivo,
@@ -257,6 +283,9 @@ def executar(base: Path, pesos: Path, saida: Path, dispositivo: str = "cpu",
                     caixas.xyxy.tolist(), caixas.cls.tolist(), caixas.conf.tolist()
                 )
             ]
+        salvar_comparacao(
+            resultado.orig_img, gts, preds, nomes, comparacoes_dir / imagem.name
+        )
         encontrados, contagem = identificar_erros(gts, preds, imagem.name, nomes)
         erros.extend(encontrados)
         totais.update(contagem)
