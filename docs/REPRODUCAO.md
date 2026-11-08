@@ -16,6 +16,12 @@ Se já criou `.venv` com Python 3.12, reutilize-o.
 Para executar CLI sem ativar o ambiente virtual, use sempre
 ` .\.venv\Scripts\python.exe ` (sem espaços ao digitar).
 
+Antes da avaliação, instale as dependências adicionais:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-avaliacao.txt
+```
+
 ## 2. Verificar a integridade da amostra
 
 ```powershell
