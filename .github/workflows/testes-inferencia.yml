@@ -1,0 +1,42 @@
+name: Testes da inferencia local
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes-unitarios:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Verificar ajuda da interface
+        run: python inferir.py --help
+      - name: Validar argumentos e chamada do modelo simulado
+        run: python -m unittest discover -s tests -v
+
+  inferencia-real:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias da inferencia
+        run: python -m pip install -r requirements-inferencia.txt
+      - name: Executar uma imagem com o checkpoint real em CPU
+        run: >-
+          python inferir.py
+          --input dataset_amostra/test/images/bolsa_feminina_sozinha7_jpg.rf.2816a38814eaf744eebc134f57e0ae25.jpg
+          --output runs/ci
+          --device cpu
+      - name: Confirmar que a imagem anotada foi gerada
+        run: |
+          python -c "from pathlib import Path; p = Path('runs/ci/bolsa_feminina_sozinha7_jpg.rf.2816a38814eaf744eebc134f57e0ae25.jpg'); assert p.is_file() and p.stat().st_size > 0, f'Arquivo ausente ou vazio: {p}'; print(p, p.stat().st_size, 'bytes')"
