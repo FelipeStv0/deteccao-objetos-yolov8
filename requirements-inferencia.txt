@@ -1,0 +1,2 @@
+# Inferência local: não requer Roboflow, Pandas nem Matplotlib.
+ultralytics>=8.3,<9
