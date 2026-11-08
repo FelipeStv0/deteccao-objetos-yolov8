@@ -101,6 +101,18 @@ explorer .\runs\avaliacao_amostra
 - **Benchmark:** `benchmark.json` traz média, mediana, p95 e ambiente de medição; não é FPS medido em vídeo.
 - **Rastreabilidade:** `metricas_amostra.json` inclui hash SHA-256 do checkpoint, versões e parâmetros.
 
+### Resultados efetivamente medidos na amostra reduzida
+
+Na [execução de avaliação #42533625319](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42533625319), com o `best.pt` real em **CPU**, o Ultralytics avaliou **dez imagens de teste rotuladas**:
+
+| Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
+| ---: | ---: | ---: | ---: |
+| 0,6948 | 0,7736 | 0,7099 | 0,4210 |
+
+A auditoria registrou **10 imagens/11 caixas de treino, 10/11 de validação e 10/10 de teste**, com **0 problemas estruturais e 0 avisos**. O diagnóstico de pareamento em ponto de operação fixo registrou **10 erros** entre falsos positivos e falsos negativos. O benchmark no runner do CI apresentou **236,56 ms/imagem, em média** (CPU, dez repetições após dois warmups); é apenas referência daquele ambiente, não do seu PC.
+
+**Não compare diretamente esses valores aos resultados históricos do relatório:** o conjunto original, os critérios experimentais completos e as condições de reprodução não estão disponíveis. O teste de dez imagens é inadequado para demonstrar generalização. Os JSONs/CSVs e o ambiente resolvido são disponibilizados como artefatos temporários na execução vinculada acima.
+
 A documentação inclui [model card](docs/MODEL_CARD.md), [guia completo de reprodução](docs/REPRODUCAO.md) e [estudo de caso para entrevistas](docs/PORTFOLIO.md). O [GitHub Actions de avaliação](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/workflows/avaliacao-amostra.yml) publica os relatórios como artefatos de cada execução.
 
 **Limite científico:** não há acesso ao dataset integral nem validação externa independente; nenhuma nota de portfólio ou medição reduzida deve ser confundida com precisão de produção.
