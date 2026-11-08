@@ -1,6 +1,7 @@
 """Testes matemáticos do diagnóstico e benchmark, sem Ultralytics."""
 
 import unittest
+from pathlib import Path
 from collections import Counter
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -76,7 +77,7 @@ class TestAvaliacao(unittest.TestCase):
         modelo = Modelo()
         with patch("avaliar_modelo.time.perf_counter",
                    side_effect=[0, 0.1, 1, 1.2, 2, 2.3]):
-            resultado = benchmark(modelo, "img.jpg", "cpu", 640, 1, 2)
+            resultado = benchmark(modelo, Path("img.jpg"), "cpu", 640, 1, 2)
         self.assertEqual(len(modelo.calls), 3)
         self.assertEqual(resultado["repeticoes"], 2)
         self.assertAlmostEqual(resultado["latencia_ms"]["media"], 250.0)
