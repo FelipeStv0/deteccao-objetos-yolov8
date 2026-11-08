@@ -43,6 +43,8 @@ erros humanos de anotação ou vazamento de conteúdo semântico**.
 | Avaliação exploratória do teste reduzido | métricas calculadas para **10 imagens anotadas** | generalização / reprodução das métricas originais |
 | Benchmark em CI (CPU) | latência na infraestrutura efêmera de GitHub Actions | FPS em PC específico ou capacidade de produção |
 
+**Medição exploratória independente da demonstração anterior:** em [execução #42533625319](https://github.com/FelipeStv0/deteccao-objetos-yolov8/actions/runs/42533625319), somente nas **10 imagens de teste da amostra**, o Ultralytics calculou Precision **0,6948**, Recall **0,7736**, mAP@0.5 **0,7099** e mAP@0.5:0.95 **0,4210**. O auditor encontrou **0 erros e 0 avisos estruturais**; a análise de pareamento fixo registrou **10 erros FP/FN**. A latência média na CPU efêmera do CI foi **236,56 ms/imagem**. Esses números **não validam generalização nem reproduzem o dataset integral**. O artefato da execução contém os relatórios e versões.
+
 Os resultados históricos do relatório PDF são **relatados**, não
 verificados independentemente com o dataset integral:
 
