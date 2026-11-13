@@ -7,36 +7,16 @@ from pathlib import Path
 from relatorios import extrair_deteccoes, salvar_relatorios
 
 ROOT = Path(__file__).resolve().parent
-EXTENSOES = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"}
-
-
-def listar_imagens(entrada: Path) -> list[Path]:
-    """Seleciona uma imagem ou todas as imagens diretas de um diretório."""
-    if not entrada.exists():
-        raise FileNotFoundError(f"Entrada não encontrada: {entrada}")
-    if entrada.is_file():
-        if entrada.suffix.lower() not in EXTENSOES:
-            raise ValueError(f"Formato de imagem não suportado: {entrada.suffix}")
-        return [entrada]
-    if not entrada.is_dir():
-        raise ValueError(f"A entrada deve ser um arquivo ou diretório: {entrada}")
-    imagens = sorted(
-        p for p in entrada.iterdir()
-        if p.is_file() and p.suffix.lower() in EXTENSOES
-    )
-    if not imagens:
-        raise ValueError(f"Nenhuma imagem compatível encontrada em: {entrada}")
-    return imagens
+# Mantém interface anterior para CLI, scripts de terceiros e testes existentes.
+from entrada_imagens import EXTENSOES, listar_imagens
+from validacao import validar_pesos, validar_parametros
 
 
 def executar(entrada: Path, pesos: Path, saida: Path, confianca: float,
              tamanho: int, dispositivo: str) -> tuple[int, int]:
-    if not pesos.is_file():
-        raise FileNotFoundError(f"Pesos não encontrados: {pesos}")
-    if not 0 <= confianca <= 1:
-        raise ValueError("--conf deve estar entre 0 e 1")
-    if tamanho <= 0:
-        raise ValueError("--imgsz deve ser positivo")
+    # Contrato comum de validacao para imagens e videos.
+    validar_pesos(pesos)
+    validar_parametros(confianca, tamanho)
 
     imagens = listar_imagens(entrada)
     saida = saida.resolve()
