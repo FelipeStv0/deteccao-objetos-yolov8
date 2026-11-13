@@ -158,3 +158,10 @@ Antes de publicar arquivos de terceiros, é necessário verificar sua procedênc
 A declaração acima descreve a finalidade do projeto; **não constitui uma afirmação de que todos os materiais atuais possuem autorização de redistribuição**.
 
 Verifique licença e permissão antes de redistribuir imagens, vídeos, pesos de terceiros ou fotografias com pessoas identificáveis.
+
+
+## Manutenção e integração
+
+Consulte [o guia de manutenção modular](docs/GUIA_MANUTENCAO.md) antes de alterar
+as entradas, a inferência ou o formato dos relatórios. Os pontos de entrada e os
+contratos CSV/JSON existentes são preservados.
