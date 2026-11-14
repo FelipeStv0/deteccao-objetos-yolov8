@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from relatorios import extrair_deteccoes, salvar_relatorios
+from validacao import validar_pesos, validar_parametros
 
 ROOT = Path(__file__).resolve().parent
 EXTENSOES_VIDEO = {".mp4", ".avi", ".mov", ".mkv"}
@@ -17,16 +18,13 @@ def executar_video(entrada: Path, pesos: Path, saida: Path, confianca: float,
         raise FileNotFoundError(f"Vídeo não encontrado: {entrada}")
     if entrada.suffix.lower() not in EXTENSOES_VIDEO:
         raise ValueError("Use um vídeo MP4, AVI, MOV ou MKV")
-    if not pesos.is_file():
-        raise FileNotFoundError(f"Pesos não encontrados: {pesos}")
+    validar_pesos(pesos)
     if saida.suffix.lower() != ".mp4":
         raise ValueError("A saída deve ter extensão .mp4")
     if entrada.resolve() == saida.resolve():
         raise ValueError("O vídeo de saída não pode substituir o arquivo original")
-    if not 0 <= confianca <= 1:
-        raise ValueError("--conf deve estar entre 0 e 1")
-    if tamanho <= 0:
-        raise ValueError("--imgsz deve ser positivo")
+    # Compartilha o contrato de parâmetros com a inferência de imagens.
+    validar_parametros(confianca, tamanho)
     if max_quadros < 0:
         raise ValueError("--max-frames não pode ser negativo")
 
