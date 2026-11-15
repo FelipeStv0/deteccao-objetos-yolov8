@@ -1,5 +1,8 @@
 # Detecção de objetos com YOLOv8
 
+**Idiomas:** [Português](README.md) | [English](README_EN.md)
+
+
 Detector de **bolsas, óculos e relógios** em imagens e vídeos, com pesos treinados no arquivo `modelo/best.pt`. A inferência é **100% local**, sem chave de Roboflow, API externa ou acesso ao dataset de treinamento.
 
 ## Exemplo visual
